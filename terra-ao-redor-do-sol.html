@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <img
+          id="universo"
+          src="https://cdn.glitch.global/44fe294c-3e49-4907-b678-c3948387bb0b/galaxia02.jpeg?v=1726669304194"
+        />
+        <img
+          id="terra"
+          src="https://cdn.glitch.global/44fe294c-3e49-4907-b678-c3948387bb0b/terra.jpeg?v=1726667378954"
+        />
+        <img
+          id="sol"
+          src="https://cdn.pixabay.com/photo/2020/02/04/16/58/map-4818824_1280.jpg"
+        />
+      </a-assets>
+
+      <a-sky src="#universo"></a-sky>
+
+      <a-entity
+        position="0 0 0"
+        animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"
+        repeat="indefinite"
+        easing="linear"
+        direction="normal"
+        fill="forwards"
+      >
+        <a-sphere
+          position="10 1.25 0"
+          material="src: #terra"
+          radius="1"
+          animation="property: rotation; to: 0 360 0; loop: true; dur: 1000"
+        >
+        </a-sphere>
+      </a-entity>
+
+      <a-sphere position="0 1.25 0" material="src: #sol" radius="3"> </a-sphere>
+
+      <a-camera position="0 5 20"></a-camera>
+    </a-scene>
+  </body>
+</html>
