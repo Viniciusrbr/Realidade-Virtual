@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <title>Penalty VR</title>
+  </head>
+  <body>
+    <a-scene>
+      <!-- Definindo o chão -->
+      <a-plane
+        position="0 0 -5"
+        rotation="-90 0 0"
+        width="20"
+        height="20"
+        src="https://cdn.glitch.global/7bdae478-23fd-4423-9b2d-c4e7a8e18740/6660506-alternar-as-cores-da-grama-do-campo-de-futebol-vista-superior-verde-frescos-relvados-para-fundo-pano-de-fundo-ou-papel-de-parede-planicies-e-gramas-de-varios-tamanhos-sao-renderizacao-em-3d-limpa-e-arr.png?v=1728995812516"
+      ></a-plane>
+
+      <!-- Definindo o gol -->
+      <a-box
+        id="goal"
+        position="0 1 -10"
+        width="6"
+        height="3"
+        depth="1"
+        src="https://cdn.glitch.global/7bdae478-23fd-4423-9b2d-c4e7a8e18740/c2ad2817587b6ae0778e5bc83a0600a1.png?v=1728995122563"
+      ></a-box>
+
+      <!-- Definindo a bola de futebol -->
+      <a-sphere
+        id="ball"
+        position="0 0.5 -2"
+        radius="0.5"
+        src="https://cdn.glitch.global/7bdae478-23fd-4423-9b2d-c4e7a8e18740/1465fc570380dbfabc1511489948abf8.png?v=1728994806636"
+      ></a-sphere>
+
+      <!-- Adicionando o estádio -->
+      <a-sky
+        src="https://cdn.glitch.global/7bdae478-23fd-4423-9b2d-c4e7a8e18740/maracana-estadio-rio-de-janeiro.png?v=1728995255900"
+      ></a-sky>
+
+      <!-- Perna para chute em primeira pessoa -->
+      <a-box
+        id="foot"
+        position="0.3 0.5 0.5"
+        rotation="0 0 0"
+        width="0.2"
+        height="0.4"
+        depth="0.1"
+        src="https://cdn.glitch.global/7bdae478-23fd-4423-9b2d-c4e7a8e18740/images.png?v=1729001673771"
+        visible="false"
+      ></a-box>
+
+      <!-- Luz -->
+      <a-light type="ambient" color="#ccc"></a-light>
+      <!-- Luz Direcional -->
+      <a-light type="directional" position="0 4 -3"></a-light>
+
+      <!-- Câmera e cursor para interação -->
+      <a-camera position="0 1.6 0">
+        <a-cursor></a-cursor>
+      </a-camera>
+
+      <!-- Placar -->
+      <a-text
+        id="score"
+        value="Pontos: 0"
+        position="-1 3 -5"
+        color="black"
+        align="center"
+      ></a-text>
+
+      <!-- Script para definir destino e chutar a bola -->
+      <script>
+        AFRAME.registerComponent("penalty-kick", {
+          schema: {
+            points: { type: "int", default: 0 },
+          },
+          init: function () {
+            let ball = document.querySelector("#ball");
+            let goal = document.querySelector("#goal");
+            let foot = document.querySelector("#foot");
+            let scoreText = document.querySelector("#score");
+
+            ball.addEventListener("click", (event) => {
+              let camera = document.querySelector("a-camera");
+              let cameraPosition = camera.getAttribute("position");
+
+              // Calcular a direção do chute
+              let direction = {
+                x: event.detail.intersection.point.x - ball.object3D.position.x,
+                y: event.detail.intersection.point.y - ball.object3D.position.y,
+                z: -10, // Direção para frente (z negativo)
+              };
+
+              let newPosition = {
+                x: ball.object3D.position.x + direction.x * 5,
+                y: ball.object3D.position.y + direction.y * 5,
+                z: direction.z,
+              };
+
+              foot.setAttribute("visible", "true");
+              foot.setAttribute("animation", {
+                property: "position",
+                from: "0.3 0.5 0.5",
+                to: "0.3 0.3 0",
+                dur: 200,
+                easing: "easeOutQuad",
+                loop: "false",
+                dir: "alternate",
+              });
+
+              ball.setAttribute("animation", {
+                property: "position",
+                to: newPosition,
+                dur: 1000,
+                easing: "easeOutQuad",
+              });
+
+              setTimeout(() => {
+                foot.setAttribute("visible", "false");
+              }, 400);
+
+              setTimeout(() => {
+                // Verificar se a bola está dentro do gol
+                if (
+                  newPosition.x >= -3 &&
+                  newPosition.x <= 3 &&
+                  newPosition.y <= 1.5
+                ) {
+                  this.data.points++;
+                  scoreText.setAttribute(
+                    "value",
+                    `Pontos: ${this.data.points}`
+                  );
+                }
+                ball.setAttribute("position", "0 0.5 -2");
+                ball.removeAttribute("animation");
+              }, 1000);
+            });
+          },
+        });
+
+        document.querySelector("#ball").setAttribute("penalty-kick", "");
+      </script>
+    </a-scene>
+  </body>
+</html>
